@@ -48,20 +48,29 @@ function loadGtag() {
   if (loaded) return;
   loaded = true;
 
-  const script = document.createElement('script');
-  script.async = true;
-  script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`;
-  document.head.appendChild(script);
-
   window.dataLayer = window.dataLayer || [];
   window.gtag = function gtag(...args: unknown[]) {
     window.dataLayer.push(args);
   };
+  // Google Consent Mode: gtag.js silently withholds every hit until this is
+  // set, regardless of our own consent banner having already gated whether
+  // loadGtag() runs at all. Must come before 'js'/'config' — setting it after
+  // does not retroactively unblock hits already queued under the default
+  // (denied) state.
+  window.gtag('consent', 'default', { ad_storage: 'granted', analytics_storage: 'granted' });
   window.gtag('js', new Date());
   // send_page_view: false — this is a client-routed SPA, so page views are
   // fired manually on each route change (see trackPageView) instead of only
   // once on the initial script load.
   window.gtag('config', GA_MEASUREMENT_ID, { send_page_view: false });
+
+  const script = document.createElement('script');
+  script.async = true;
+  // Cache-busted: without this, a gtag.js instance already cached in this
+  // browser from an earlier consent state can get served without properly
+  // re-initializing against the fresh consent signal queued above.
+  script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}&t=${Date.now()}`;
+  document.head.appendChild(script);
 
   trackPageView(currentSpaPath());
 }
