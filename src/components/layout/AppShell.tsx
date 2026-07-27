@@ -3,12 +3,22 @@ import { Outlet, useLocation, useNavigationType } from 'react-router-dom';
 import { Header } from './Header';
 import { Sidebar } from './Sidebar';
 import { Footer } from './Footer';
+import { ConsentBanner } from './ConsentBanner';
+import { initAnalyticsIfConsented, trackPageView } from '../../lib/analytics';
 
 export function AppShell() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
   const navigationType = useNavigationType();
   const isHome = location.pathname === '/';
+
+  useEffect(() => {
+    initAnalyticsIfConsented();
+  }, []);
+
+  useEffect(() => {
+    trackPageView(location.pathname);
+  }, [location.pathname]);
 
   useEffect(() => {
     // Only force scroll-to-top when moving forward to a new page (clicking a
@@ -31,6 +41,7 @@ export function AppShell() {
         </main>
       </div>
       <Footer />
+      <ConsentBanner />
     </div>
   );
 }
