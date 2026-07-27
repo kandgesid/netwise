@@ -1,3 +1,4 @@
+import { ChapterPage } from '../layout/ChapterPage';
 import { SectionHead } from '../ui/SectionHead';
 import { Card } from '../ui/Card';
 import { AutoLink } from '../../lib/autoLink';
@@ -19,7 +20,7 @@ const POINTS = [
 
 export function Chapter2WhatItDoes() {
   return (
-    <section id="ch2" className="max-w-[1080px] mx-auto px-8 py-18">
+    <ChapterPage title="Chapter 2: What it does">
       <SectionHead eyebrow="Chapter 2" title="What a firewall actually does">
         Checking an address and a port only gets a firewall so far. To really know what's inside traffic,
         rather than just guess from the outside, it has to deal with the fact that almost everything today
@@ -38,6 +39,6 @@ export function Chapter2WhatItDoes() {
         So how does a connection actually become encrypted in the first place? That moment, the handshake,
         is next.
       </p>
-    </section>
+    </ChapterPage>
   );
 }

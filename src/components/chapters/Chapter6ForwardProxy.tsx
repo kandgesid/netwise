@@ -1,7 +1,17 @@
+import { ChapterPage } from '../layout/ChapterPage';
 import { SectionHead } from '../ui/SectionHead';
 import { Card } from '../ui/Card';
+import { ChapterTOC } from '../ui/ChapterTOC';
 import { AutoLink } from '../../lib/autoLink';
 import { SessionTrackingViz } from './SessionTrackingViz';
+
+const TOC_ITEMS = [
+  { id: 'where-used', label: 'Where it\'s used' },
+  { id: 'deployed', label: 'How it\'s deployed' },
+  { id: 'standing', label: 'Standing considerations' },
+  { id: 'quic', label: 'QUIC and HTTP/3' },
+  { id: 'adapts', label: 'How deployments adapt' },
+];
 
 const USES = ['Malware downloads', 'Data exfiltration', 'Policy violations'];
 
@@ -52,14 +62,16 @@ const QUIC_RESPONSE_POINTS = [
 
 export function Chapter6ForwardProxy() {
   return (
-    <section id="ch6" className="max-w-[1080px] mx-auto px-8 py-18">
+    <ChapterPage title="Chapter 6: Forward proxy">
       <SectionHead eyebrow="Chapter 6" title="Forward proxy, in depth">
         You've now seen forward proxy from a few angles: one of the three firewall types in Chapter 1, a
         legitimate man-in-the-middle in Chapter 3, and what actually turns it on, from Chapter 5's
         decryption policy. This is what it actually takes to run one.
       </SectionHead>
 
-      <Card className="mb-5">
+      <ChapterTOC items={TOC_ITEMS} />
+
+      <Card id="where-used" className="mb-5">
         <h3 className="font-sans font-semibold text-base mb-2">Where it's used</h3>
         <p className="text-ink-dim text-[14.5px] mb-2.5">
           Organizations use forward proxy to get visibility into traffic their own users generate going out
@@ -72,7 +84,7 @@ export function Chapter6ForwardProxy() {
         </ul>
       </Card>
 
-      <Card className="mb-5">
+      <Card id="deployed" className="mb-5">
         <h3 className="font-sans font-semibold text-base mb-2.5">How it's actually deployed</h3>
         <ol className="pl-4 text-ink-dim text-[14.5px] space-y-3 list-decimal marker:text-line">
           {DEPLOY_STEPS.map((step, idx) => (
@@ -81,7 +93,7 @@ export function Chapter6ForwardProxy() {
         </ol>
       </Card>
 
-      <Card className="mb-5">
+      <Card id="standing" className="mb-5">
         <h3 className="font-sans font-semibold text-base mb-2.5">Two things that aren't a one-time step</h3>
         <p className="text-ink-dim text-[14.5px] mb-2.5">
           These aren't sequenced after the setup above, they're standing considerations that apply
@@ -94,7 +106,7 @@ export function Chapter6ForwardProxy() {
         </ul>
       </Card>
 
-      <Card className="mb-5">
+      <Card id="quic" className="mb-5">
         <h3 className="font-sans font-semibold text-base mb-2.5">What changes next: QUIC and HTTP/3</h3>
         <p className="text-ink-dim text-[14.5px] mb-2.5">
           <AutoLink text="Every deployment step above assumes the traffic riding through it looks the same underneath: a TCP connection, then TLS layered on top of it. HTTP/3 doesn't make that assumption anymore. It runs over QUIC, a transport built without a firewall looking over its shoulder in mind, and it still shows up on the familiar port 443, just over UDP instead of TCP." />
@@ -108,7 +120,7 @@ export function Chapter6ForwardProxy() {
         </ul>
       </Card>
 
-      <Card className="mb-5">
+      <Card id="adapts" className="mb-5">
         <h3 className="font-sans font-semibold text-base mb-2.5">How a forward proxy deployment adapts</h3>
         <p className="text-ink-dim text-[14.5px] mb-2.5">
           <AutoLink text="None of that makes HTTP/3 traffic invisible, it just means the tools this chapter already covers aren't enough on their own anymore. Real deployments handle it one of two ways." />
@@ -134,6 +146,6 @@ export function Chapter6ForwardProxy() {
         connection's location: which zone it's in, which policy rule it matches, which certificate gets
         presented. Chapter 7 asks what changes once location by itself stops being enough.
       </p>
-    </section>
+    </ChapterPage>
   );
 }

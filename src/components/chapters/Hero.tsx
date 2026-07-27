@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { Button } from '../ui/Button';
 
 const LINES = [
@@ -16,6 +17,14 @@ const NODES = [
   { cx: 260, cy: 180, r: 14, delay: 1.4, label: 'internet site', lx: 245, ly: 202 },
 ];
 
+// Shared with WelcomeBack.tsx's collapsed "What Netwise is" disclosure, so
+// returning visitors see the exact same pitch, just tucked away by default.
+export const PITCH_TEXT =
+  'Netwise is a simulation, on purpose. A safe sandbox for people starting from zero, with no ' +
+  'prior networking knowledge assumed. You build firewall rules, run simulated traffic through ' +
+  "them, and see exactly why it passed or got blocked, without needing a real network or any " +
+  'risk of breaking one.';
+
 export function Hero() {
   return (
     <section className="pt-22 pb-16 grid md:grid-cols-2 gap-12 items-center max-w-[1080px] mx-auto px-8">
@@ -26,15 +35,10 @@ export function Hero() {
         <h1 className="font-mono font-bold text-[40px] leading-[1.15] mb-5 tracking-tight">
           Learn how traffic actually moves, by moving it yourself.
         </h1>
-        <p className="text-ink-dim text-[17px] max-w-[46ch] mb-7">
-          Netwise is a simulation, on purpose. A safe sandbox for people starting from zero, with no
-          prior networking knowledge assumed. You build firewall rules, run simulated traffic through
-          them, and see exactly why it passed or got blocked, without needing a real network or any
-          risk of breaking one.
-        </p>
-        <a href="#ch1">
+        <p className="text-ink-dim text-[17px] max-w-[46ch] mb-7">{PITCH_TEXT}</p>
+        <Link to="/chapters/firewall">
           <Button variant="primary">Start the learning path →</Button>
-        </a>
+        </Link>
       </div>
       <svg viewBox="0 0 400 240" className="w-full h-auto">
         {LINES.map((line, i) => (

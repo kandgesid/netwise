@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-Netwise is an interactive, simulation-based learning environment for network and security fundamentals: six narrative chapters (firewall basics → SSL/TLS handshake → key exchange & cipher suites → decryption policies → forward proxy deep dive), a hands-on firewall rule sandbox, a certificate-use-case reference, and a searchable glossary with hover tooltips on every acronym. It's a single-page app — `src/App.tsx` renders one long page by listing every section component in order.
+Netwise is an interactive, simulation-based learning environment for network and security fundamentals: seven narrative chapters (firewall basics → what a firewall does → SSL/TLS handshake → key exchange & cipher suites → decryption policies → forward proxy deep dive → Zero Trust), a hands-on firewall rule sandbox, a certificate-use-case reference, and a searchable glossary with hover tooltips on every acronym. It's a routed multi-page site (`react-router-dom`, `HashRouter`) — a hub/landing page at `/` links out to one route per chapter/tool, each rendered inside a persistent shell with a collapsible sidebar. See "Routing & page structure" below.
 
 ## Commands
 
@@ -23,6 +23,7 @@ There is no test suite/framework configured in this repo.
 - Vite + React 19 + TypeScript
 - Tailwind CSS v4 for styling — theme tokens live in `src/index.css`; there is no `tailwind.config.js` (not needed with v4's Vite plugin)
 - Framer Motion for animation (Hero schematic, Chapter 1 checkpoint viz, Chapter 3 handshake stepper)
+- react-router-dom (`HashRouter`) for routing — chosen over `BrowserRouter` because no hosting/deployment target is fixed yet; hash routing works on any static host with zero server config and is a one-line swap to `BrowserRouter` later
 - lucide-react for icons, clsx for conditional classNames
 - oxlint (not eslint) for linting, configured in `.oxlintrc.json`
 
@@ -33,26 +34,32 @@ There is no test suite/framework configured in this repo.
 - `data/acronyms.ts` — acronym → full name dictionary, powers tooltips everywhere
 - `data/handshakeSteps.ts` — the 3-mode handshake stepper (Chapter 3)
 - `data/cipherSuite.ts` — cipher suite decoder chips (Chapter 4)
-- `data/certificates.ts` — certificate tab content (Reference section)
+- `data/certificates.ts` — certificate tab content (Certificates tool)
 - `data/glossary.ts` — glossary entries, grouped by category
 - `data/sandboxScenarios.ts` — firewall rule options & test-traffic scenarios (Sandbox)
 
 **Acronym tooltips are automatic, not manual.** Any body copy that might contain a known acronym should be rendered via `<AutoLink text={...} />` (`src/lib/autoLink.tsx`) instead of a raw string — it regex-matches against `ACRONYMS` from `data/acronyms.ts` and wraps matches in a hoverable/focusable tooltip. Adding a new acronym is a one-line addition to that dictionary; no component wiring needed.
 
-**Adding a new chapter is mechanical by design:**
-1. Add a data file under `src/data/` if the chapter needs its own content.
-2. Create `src/components/chapters/Chapter7Whatever.tsx`, using an existing chapter (e.g. `Chapter5DecryptionPolicies.tsx`) as a template — `<SectionHead>` for the intro, `<Card>` for content blocks, `<AutoLink text={...} />` for any copy with acronyms.
-3. Add one line to `src/App.tsx` to render it in place in the page list.
-4. Add one line to `NAV_LINKS` in `src/components/layout/Header.tsx` so it appears in header nav.
+## Routing & page structure
+
+`src/routes.tsx` is the single source of truth for every page. It exports a `ROUTES` array of `RouteEntry` objects (`{ path, navLabel, description, group: 'course' | 'tools', order, chapterNumber?, element }`), plus `COURSE_ROUTES`/`TOOL_ROUTES`, the same array pre-filtered and sorted. `src/App.tsx` just maps `ROUTES` into a `<Routes>` tree nested inside `AppShell`; the sidebar (`Sidebar.tsx`), the home page's card grid (`pages/Home.tsx`), and each chapter's prev/next footer (`ChapterPage.tsx`) all derive their content from that same array — nothing else needs to change per page.
+
+`AppShell.tsx` (logo top bar + collapsible sidebar + `<Outlet />` + footer) is what every routed page mounts inside. The sidebar is a normal in-flow column on desktop and an off-canvas drawer on mobile (toggled by the top bar's hamburger button); it's hidden entirely on the home page.
+
+**Adding a new chapter or tool is mechanical by design:**
+1. Add a data file under `src/data/` if it needs its own content.
+2. Create `src/components/chapters/Chapter8Whatever.tsx` (or a tool under `components/sandbox`/`components/reference`), using an existing chapter (e.g. `Chapter5DecryptionPolicies.tsx`) as a template. Wrap the returned JSX in `<ChapterPage title="...">...</ChapterPage>` instead of a raw `<section>` — `ChapterPage` owns the container styling, the page-title side effect, the "Chapter N of M" indicator, and the prev/next footer (computed automatically from `routes.tsx`).
+3. Add one entry to the `ROUTES` array in `src/routes.tsx`. That's the only other file that needs a change — it shows up in the sidebar, the home page, and prev/next automatically.
+4. For a heavy chapter (4+ `<Card>` sections), optionally add a `<ChapterTOC items={[...]} />` right after `<SectionHead>` and give each `<Card>` a matching `id` prop — see `Chapter3Handshake.tsx` for the pattern.
 
 **Component directories:**
-- `components/ui/` — reusable primitives (Card, Button, Toggle, SectionHead)
-- `components/layout/` — Header (nav) and Footer
-- `components/chapters/` — one component per chapter, plus chapter-specific visualizations (FirewallCheckpointViz, HandshakeStepper, CipherDecoder)
+- `components/ui/` — reusable primitives (Card, Button, Toggle, SectionHead, ChapterTOC)
+- `components/layout/` — AppShell, Sidebar, Header (slim top bar), ChapterPage, Footer
+- `components/home/` — ChapterCard (hub page grid)
+- `components/chapters/` — one component per chapter, plus chapter-specific visualizations (FirewallCheckpointViz, HandshakeStepper, CipherDecoder, SinglePassViz, SessionTrackingViz, ContinuousVerificationViz, TrustSignalsViz)
 - `components/sandbox/` — the rule-builder + test-traffic Sandbox
-- `components/reference/` — CertificateTabs and Glossary
-
-**Nav scroll offset:** every section that's a nav target needs `scroll-margin-top` (set via the `section[id]` rule in `src/index.css`) so the sticky header doesn't cover the section top when a nav link jumps to it. If a section's header height changes, adjust that value to match.
+- `components/reference/` — CertificateTabs, CertificateFieldDecoder, VerificationWalkthrough, Glossary
+- `pages/` — top-level route components that aren't chapters/tools (currently just `Home.tsx`, the hub page)
 
 ## Design system
 

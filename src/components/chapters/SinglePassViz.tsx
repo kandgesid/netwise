@@ -1,6 +1,8 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Card } from '../ui/Card';
 import { Toggle } from '../ui/Toggle';
+import { TOOL_LINK_CLASS } from '../ui/toolLinkClass';
 import { AutoLink } from '../../lib/autoLink';
 
 /**
@@ -43,8 +45,11 @@ const ROW1_SINGLE =
 
 const ROW2_CAPTION = 'One pass, no matter how many of these are active.';
 
-const CAVEAT =
-  "One thing this isn't saying: that turning features on is free. Each one still does real work inside that single traversal, more signatures to check, more computation. What single-pass avoids specifically is paying for each feature as its own separate trip through the packet's path. It's also part of why the Sandbox further down this page can show App-ID's verdict instantly, for clarity, without that being a bigger simplification than it already is.";
+const CAVEAT_BEFORE =
+  "One thing this isn't saying: that turning features on is free. Each one still does real work inside that single traversal, more signatures to check, more computation. What single-pass avoids specifically is paying for each feature as its own separate trip through the packet's path. It's also part of why the";
+
+const CAVEAT_AFTER =
+  "can show App-ID's verdict instantly, for clarity, without that being a bigger simplification than it already is.";
 
 const CLOSING =
   "One related fact this toggle doesn't show: single-pass firewalls also typically handle many different sessions at once, spread across dedicated processing cores. That's a separate lever, how many packets get worked on in parallel, not how many stages any one packet's own trip involves, which is what's actually being compared above.";
@@ -110,7 +115,11 @@ export function SinglePassViz() {
       </div>
 
       <p className="text-ink-faint text-[12.5px] mb-4">
-        <AutoLink text={CAVEAT} />
+        <AutoLink text={CAVEAT_BEFORE} />{' '}
+        <Link to="/sandbox" className={TOOL_LINK_CLASS}>
+          Sandbox
+        </Link>{' '}
+        <AutoLink text={CAVEAT_AFTER} />
       </p>
 
       <p className="text-ink-dim text-[14.5px]">

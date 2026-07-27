@@ -34,44 +34,55 @@ need to touch a file under `src/data/`, not a component.
 - `src/data/acronyms.ts` — acronym → full name dictionary, powers tooltips everywhere
 - `src/data/handshakeSteps.ts` — the 3-mode handshake stepper (Chapter 3)
 - `src/data/cipherSuite.ts` — cipher suite decoder chips (Chapter 4)
-- `src/data/certificates.ts` — certificate tab content (Reference section)
+- `src/data/certificates.ts` — certificate tab content (Certificates tool)
 - `src/data/glossary.ts` — glossary entries, grouped by category
 - `src/data/sandboxScenarios.ts` — firewall rule options & test-traffic scenarios (Sandbox)
 
 Component directories:
 
-- `src/components/ui/` — reusable primitives (`Card`, `Button`, `Toggle`, `SectionHead`)
-- `src/components/layout/` — `Header` (nav) and `Footer`
+- `src/components/ui/` — reusable primitives (`Card`, `Button`, `Toggle`, `SectionHead`, `ChapterTOC`)
+- `src/components/layout/` — `AppShell`, `Sidebar`, `Header` (slim top bar), `ChapterPage`, `Footer`
+- `src/components/home/` — `ChapterCard` (hub page grid)
 - `src/components/chapters/` — one component per chapter, plus chapter-specific
-  visualizations (`FirewallCheckpointViz`, `HandshakeStepper`, `CipherDecoder`)
+  visualizations (`FirewallCheckpointViz`, `HandshakeStepper`, `CipherDecoder`, and others)
 - `src/components/sandbox/` — the rule-builder + test-traffic Sandbox
 - `src/components/reference/` — `CertificateTabs` and `Glossary`
+- `src/pages/` — top-level route components that aren't chapters/tools (currently just `Home.tsx`)
 
-`src/App.tsx` renders the whole page as one flat list of section components,
-in order.
+Netwise is a routed multi-page site (`react-router-dom`, `HashRouter`), not a
+single scrolling page. `src/routes.tsx` is the one file that lists every
+page — see the recipe below.
 
-## Recipe: adding a new chapter
+## Recipe: adding a new chapter or tool
 
 This is the main way the project is expected to grow, and it's designed to
 be a small, mechanical change:
 
 1. If the chapter needs its own structured content (like the handshake steps
    or cipher suite parts do), add a data file under `src/data/`.
-2. Create `src/components/chapters/Chapter7Whatever.tsx`. Use an existing
+2. Create `src/components/chapters/Chapter8Whatever.tsx`. Use an existing
    chapter as a template — `src/components/chapters/Chapter5DecryptionPolicies.tsx`
    is a good simple one to copy from. Use `<SectionHead>` for the intro,
    `<Card>` for content blocks, and `<AutoLink text={...} />` (see below) for
-   any copy that might contain an acronym. Give the wrapping `<section>` a
-   stable `id` (e.g. `id="ch7"`) — the header nav links to it by anchor.
-3. Add one line to `src/App.tsx` to render the new component in place in the
-   page list.
-4. Add one line to the `NAV_LINKS` array in `src/components/layout/Header.tsx`,
-   e.g. `{ href: '#ch7', label: '7. Whatever' }`, so it appears in the header nav.
+   any copy that might contain an acronym. Wrap the whole thing in
+   `<ChapterPage title="Chapter 8: Whatever">...</ChapterPage>` instead of a
+   raw `<section>` — it owns the container styling, the page title, the
+   "Chapter N of M" indicator, and the prev/next footer, all computed
+   automatically from `src/routes.tsx`.
+3. Add one entry to the `ROUTES` array in `src/routes.tsx` (`path`,
+   `navLabel`, a one-line `description` for its hub-page card, `group:
+   'course'`, and the next `order`/`chapterNumber`). That's the only other
+   file that needs a change — it now appears in the sidebar, the home page's
+   course grid, and prev/next navigation automatically.
+4. Optional, for a heavy chapter (4+ `<Card>` sections): add
+   `<ChapterTOC items={[{ id: 'foo', label: 'Foo' }, ...]} />` right after
+   `<SectionHead>`, and give each `<Card>` a matching `id` prop. See
+   `Chapter3Handshake.tsx` for a worked example.
 
-If your new section's header height differs from existing ones, you may also
-need to adjust the `scroll-margin-top` value on the `section[id]` rule in
-`src/index.css` so the sticky header doesn't cover the section top when a nav
-link jumps to it.
+A new **tool** (not part of the chapter sequence, like Sandbox/Certificates/
+Glossary) follows the same shape but goes under `src/components/<area>/`
+instead of `chapters/`, and its `ROUTES` entry uses `group: 'tools'` and no
+`chapterNumber`.
 
 Content-only PRs (fixing wording, correcting a technical detail, expanding an
 explanation) are welcome and don't need to follow the full "new chapter"
@@ -99,9 +110,9 @@ an entry to the relevant category array in `src/data/glossary.ts`:
 { term: 'Zone', def: 'A named grouping of interfaces the firewall uses to define what counts as "inside" versus "outside" for policy purposes.' },
 ```
 
-Categories currently are `firewall`, `tls`, and `vpn`. If your entry doesn't
-fit an existing category, propose a new one in your PR description rather
-than jamming it into the closest match.
+Categories currently are `firewall`, `tls`, `vpn`, and `zerotrust`. If your
+entry doesn't fit an existing category, propose a new one in your PR
+description rather than jamming it into the closest match.
 
 ## Coding conventions
 

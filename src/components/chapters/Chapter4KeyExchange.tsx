@@ -1,3 +1,4 @@
+import { ChapterPage } from '../layout/ChapterPage';
 import { SectionHead } from '../ui/SectionHead';
 import { Card } from '../ui/Card';
 import { CipherDecoder } from './CipherDecoder';
@@ -28,7 +29,7 @@ const PQ_POINTS = [
 
 export function Chapter4KeyExchange() {
   return (
-    <section id="ch4" className="max-w-[1080px] mx-auto px-8 py-18">
+    <ChapterPage title="Chapter 4: Key exchange">
       <SectionHead eyebrow="Chapter 4" title="Key exchange groups & cipher suites">
         Two things were doing the real work during the "key exchange" step you just watched: the key
         exchange group decides <em>how</em> the shared secret gets derived, and the cipher suite decides{' '}
@@ -89,6 +90,6 @@ export function Chapter4KeyExchange() {
         told the firewall to decrypt this traffic in the first place. That instruction is next: decryption
         policy.
       </p>
-    </section>
+    </ChapterPage>
   );
 }

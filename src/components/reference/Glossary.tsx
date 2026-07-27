@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { ChapterPage } from '../layout/ChapterPage';
 import { SectionHead } from '../ui/SectionHead';
 import { Card } from '../ui/Card';
 import { Toggle } from '../ui/Toggle';
@@ -17,7 +18,7 @@ export function Glossary() {
   const entries = GLOSSARY[cat];
 
   return (
-    <section id="glossary" className="max-w-[1080px] mx-auto px-8 py-18">
+    <ChapterPage title="Glossary">
       <SectionHead eyebrow="Reference" title="Terminology, in plain terms">
         The same words come up constantly once you're actually reading firewall configs. No definitions
         written to impress, just what each term means and why it exists.
@@ -38,6 +39,6 @@ export function Glossary() {
           ))}
         </ul>
       </Card>
-    </section>
+    </ChapterPage>
   );
 }

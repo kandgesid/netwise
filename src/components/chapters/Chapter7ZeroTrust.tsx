@@ -1,8 +1,20 @@
+import { Link } from 'react-router-dom';
+import { ChapterPage } from '../layout/ChapterPage';
 import { SectionHead } from '../ui/SectionHead';
 import { Card } from '../ui/Card';
+import { ChapterTOC } from '../ui/ChapterTOC';
+import { TOOL_LINK_CLASS } from '../ui/toolLinkClass';
 import { AutoLink } from '../../lib/autoLink';
 import { ContinuousVerificationViz } from './ContinuousVerificationViz';
 import { TrustSignalsViz } from './TrustSignalsViz';
+
+const TOC_ITEMS = [
+  { id: 'location', label: 'When location stops being proof' },
+  { id: 'verify-every', label: 'Verify every request' },
+  { id: 'signals', label: 'Three signals' },
+  { id: 'scope', label: 'Smaller than a zone' },
+  { id: 'coexist', label: 'Doesn\'t replace the firewall' },
+];
 
 const BOUNDARY_POINTS = [
   {
@@ -81,7 +93,7 @@ const COEXIST_POINTS = [
 
 export function Chapter7ZeroTrust() {
   return (
-    <section id="ch7" className="max-w-[1080px] mx-auto px-8 py-18">
+    <ChapterPage title="Chapter 7: Zero Trust">
       <SectionHead eyebrow="Chapter 7" title="Zero Trust: verify every time">
         Chapter 1 opened with a firewall deciding what counts as 'inside' a zone versus 'outside' it,
         then trusting a lot of what happens next based on that answer alone. Chapters 2 through 6 were
@@ -90,7 +102,9 @@ export function Chapter7ZeroTrust() {
         being proof of anything by itself.
       </SectionHead>
 
-      <Card className="mb-5">
+      <ChapterTOC items={TOC_ITEMS} />
+
+      <Card id="location" className="mb-5">
         <h3 className="font-sans font-semibold text-base mb-2">When location stops being proof</h3>
         <p className="text-ink-dim text-[14.5px] mb-2.5">
           <AutoLink text="None of this is a knock on the zone model from Chapter 1. Zones, perimeters, and the whole decrypt-and-inspect pipeline from Chapters 2 through 6 are still exactly how a huge amount of real traffic gets decided on, today, in production. The problem is narrower than 'the old way was wrong': location was always a proxy for trust, not trust itself, and the gap between the two got more expensive to ignore." />
@@ -106,7 +120,7 @@ export function Chapter7ZeroTrust() {
 
       <ContinuousVerificationViz />
 
-      <Card className="mb-5">
+      <Card id="verify-every" className="mb-5">
         <h3 className="font-sans font-semibold text-base mb-2">Verify every request, not just the first one</h3>
         <p className="text-ink-dim text-[14.5px] mb-2.5">
           <AutoLink text="Zero Trust is the industry's name for closing that gap. The core idea, sometimes summarized as 'never trust, always verify': no request gets automatic trust just because of where it came from, inside the zone or outside it. Every access attempt gets checked against who's actually asking and what they're asking from, every time, not once at the edge and then coasted on for the rest of the session." />
@@ -120,7 +134,7 @@ export function Chapter7ZeroTrust() {
         </ul>
       </Card>
 
-      <Card className="mb-5">
+      <Card id="signals" className="mb-5">
         <h3 className="font-sans font-semibold text-base mb-2">Three signals, checked every time</h3>
         <p className="text-ink-dim text-[14.5px] mb-2.5">
           <AutoLink text="Chapter 3's User-ID already answered one piece of this: knowing who's actually sending traffic, not just where it came from. Zero Trust asks the same kind of question of every request, and adds two more signals alongside it." />
@@ -136,7 +150,7 @@ export function Chapter7ZeroTrust() {
 
       <TrustSignalsViz />
 
-      <Card className="mb-5">
+      <Card id="scope" className="mb-5">
         <h3 className="font-sans font-semibold text-base mb-2">Smaller than a zone</h3>
         <p className="text-ink-dim text-[14.5px] mb-2.5">
           <AutoLink text="Chapter 1's Zone answered a broad question: what's inside versus outside. Zero Trust asks a narrower one underneath it: even inside a zone that's already been let in, should this specific identity, on this specific device, reach this specific resource, or just some of what happens to share its zone?" />
@@ -150,7 +164,7 @@ export function Chapter7ZeroTrust() {
         </ul>
       </Card>
 
-      <Card className="mb-5">
+      <Card id="coexist" className="mb-5">
         <h3 className="font-sans font-semibold text-base mb-2">Zero Trust doesn't replace the firewall</h3>
         <p className="text-ink-dim text-[14.5px] mb-2.5">
           <AutoLink text="Every rule the last six chapters covered is still doing real, necessary work. A decryption policy from Chapter 5 still has to run before anything downstream can be inspected at all. App-ID, User-ID, and Content-ID from Chapter 3 are still how a firewall answers what actually is this, who's actually sending it, and is anything in it dangerous. Zones from Chapter 1 haven't gone anywhere either." />
@@ -167,9 +181,12 @@ export function Chapter7ZeroTrust() {
       <p className="text-ink-faint text-[13.5px] mt-4">
         You've now seen both halves: the zone-based, decrypt-and-inspect model from Chapters 1 through
         6, and the identity-and-device-checked model this chapter adds on top of it. Time to build a
-        rule yourself and watch the difference between a check keyed to a port and one keyed to an
-        actual identity.
+        rule yourself in the{' '}
+        <Link to="/sandbox" className={TOOL_LINK_CLASS}>
+          Sandbox
+        </Link>{' '}
+        and watch the difference between a check keyed to a port and one keyed to an actual identity.
       </p>
-    </section>
+    </ChapterPage>
   );
 }

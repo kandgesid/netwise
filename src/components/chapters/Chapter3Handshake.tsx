@@ -1,8 +1,19 @@
+import { Link } from 'react-router-dom';
+import { ChapterPage } from '../layout/ChapterPage';
 import { SectionHead } from '../ui/SectionHead';
 import { Card } from '../ui/Card';
+import { ChapterTOC } from '../ui/ChapterTOC';
+import { TOOL_LINK_CLASS } from '../ui/toolLinkClass';
 import { AutoLink } from '../../lib/autoLink';
 import { HandshakeStepper } from './HandshakeStepper';
 import { SinglePassViz } from './SinglePassViz';
+
+const TOC_ITEMS = [
+  { id: 'three-lenses', label: 'Three lenses' },
+  { id: 'single-pass', label: 'One pass, not one per feature' },
+  { id: 'mitm', label: 'MITM, on purpose' },
+  { id: 'ech', label: 'Encrypted Client Hello' },
+];
 
 const PIPELINE_POINTS = [
   {
@@ -74,22 +85,27 @@ const ECH_POINTS = [
 
 export function Chapter3Handshake() {
   return (
-    <section id="ch3" className="max-w-[1080px] mx-auto px-8 py-18">
+    <ChapterPage title="Chapter 3: Handshake">
       <SectionHead eyebrow="Chapter 3" title="Inside the SSL/TLS handshake">
         Every secure connection follows the same sequence: a connection is opened, identity is proven, then
         a firewall inspects and decides. Step through it once end to end, then switch scenarios to see how
         the story changes.
       </SectionHead>
 
+      <ChapterTOC items={TOC_ITEMS} />
+
       <div className="mb-6">
         <HandshakeStepper />
       </div>
 
-      <Card className="mb-6">
+      <Card id="three-lenses" className="mb-6">
         <h3 className="font-sans font-semibold text-base mb-2">Three lenses the firewall applies</h3>
         <p className="text-ink-dim text-[14.5px] mb-2.5">
-          You'll have seen these three names go by in the stepper above. Worth pinning down before the
-          sandbox later on, since it's built entirely around them:
+          You'll have seen these three names go by in the stepper above. Worth pinning down before the{' '}
+          <Link to="/sandbox" className={TOOL_LINK_CLASS}>
+            Sandbox
+          </Link>
+          , since it's built entirely around them:
         </p>
         <ul className="pl-4 text-ink-dim text-[14.5px] space-y-2 list-disc marker:text-line mb-3.5">
           {PIPELINE_POINTS.map((p) => (
@@ -103,7 +119,7 @@ export function Chapter3Handshake() {
         </p>
       </Card>
 
-      <Card className="mb-6">
+      <Card id="single-pass" className="mb-6">
         <h3 className="font-sans font-semibold text-base mb-2">One pass, not one per feature</h3>
         <p className="text-ink-dim text-[14.5px] mb-2.5">
           <AutoLink text="Look back at those three lenses, then add one more thing this chapter already covers: a firewall doing forward proxy or inbound inspection is decrypting that traffic too, on every packet, before any of the three lenses even get a look at it. If a firewall is doing this much work on every packet, why doesn't switching more of it on make everything slower?" />
@@ -122,7 +138,7 @@ export function Chapter3Handshake() {
 
       <SinglePassViz />
 
-      <Card className="mb-6">
+      <Card id="mitm" className="mb-6">
         <h3 className="font-sans font-semibold text-base mb-2">A man-in-the-middle, on purpose</h3>
         <p className="text-ink-dim text-[14.5px] mb-2.5">
           Switch to "Forward proxy" in the stepper above and watch closely. The firewall intercepts the
@@ -139,7 +155,7 @@ export function Chapter3Handshake() {
         </ul>
       </Card>
 
-      <Card className="mb-6">
+      <Card id="ech" className="mb-6">
         <h3 className="font-sans font-semibold text-base mb-2">What changes next: Encrypted Client Hello</h3>
         <p className="text-ink-dim text-[14.5px] mb-2.5">
           <AutoLink text="One piece of the handshake was never covered by any of this: the SNI field in the very first message, ClientHello, where the client states which hostname it's trying to reach, sent in the clear even under TLS 1.3, the version this chapter otherwise treats as the modern default. Encrypted Client Hello (ECH) is the extension that closes that last gap, and it changes what each of this chapter's three scenarios actually gets to see." />
@@ -156,6 +172,6 @@ export function Chapter3Handshake() {
       <p className="text-ink-faint text-[13.5px] mt-4">
         <AutoLink text="The public key that makes ECH's encryption possible has to come from somewhere the two sides agreed on ahead of time, without ever exchanging it directly on this connection. That's the same asymmetric-key idea Chapter 4 covers next, and in most real ECH deployments today, it runs on X25519, the same curve Chapter 4 names as one of the two in common use." />
       </p>
-    </section>
+    </ChapterPage>
   );
 }

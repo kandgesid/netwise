@@ -30,11 +30,10 @@
       linear-gradient(90deg, rgba(34,197,94,0.05) 1px, transparent 1px);
     background-size: 32px 32px;
   }
-  /* Every scroll-target section gets breathing room so the sticky header
-     never covers its heading when a nav link jumps to it. This is the fix
-     for the "clicking nav does nothing" bug from the single-file version. */
-  section[id] {
-    scroll-margin-top: 88px;
+  /* Every scroll-target (currently: ChapterTOC's in-page jump links) gets
+     breathing room so the sticky top bar never covers it. */
+  [id] {
+    scroll-margin-top: 76px;
   }
   a:focus-visible, button:focus-visible, select:focus-visible {
     outline: 2px solid var(--color-accent);

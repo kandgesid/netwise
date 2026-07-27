@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { ChapterPage } from '../layout/ChapterPage';
 import { SectionHead } from '../ui/SectionHead';
 import { Card } from '../ui/Card';
 import { Toggle } from '../ui/Toggle';
@@ -18,7 +19,7 @@ export function CertificateTabs() {
   const data = CERT_DATA[tab];
 
   return (
-    <section id="reference" className="max-w-[1080px] mx-auto px-8 py-18">
+    <ChapterPage title="Certificate reference">
       <SectionHead eyebrow="Reference" title="The same certificate concept, three different jobs">
         A certificate isn't one thing used one way. Where it sits and who holds the private key changes
         completely depending on whether the firewall is watching outbound browsing, protecting an inbound
@@ -78,6 +79,6 @@ export function CertificateTabs() {
 
       <CertificateFieldDecoder />
       <VerificationWalkthrough />
-    </section>
+    </ChapterPage>
   );
 }

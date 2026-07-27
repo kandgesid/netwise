@@ -1,6 +1,8 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Card } from '../ui/Card';
 import { Toggle } from '../ui/Toggle';
+import { TOOL_LINK_CLASS } from '../ui/toolLinkClass';
 import { AutoLink } from '../../lib/autoLink';
 
 /**
@@ -53,8 +55,8 @@ const SIGNALS: Signal[] = [
   },
 ];
 
-const INTRO =
-  "Every rule the Sandbox and Chapter 5's policy evaluator taught you to build checks one thing at a time: a port, an app, a person. Zero Trust checks several independent things about the same finance-team employee's request at once: who's asking (identity), what they're asking from (device), and where and when they're asking (context). Toggle each one below and watch what it takes to get an ALLOW.";
+const INTRO_AFTER =
+  "and Chapter 5's policy evaluator taught you to build checks one thing at a time: a port, an app, a person. Zero Trust checks several independent things about the same finance-team employee's request at once: who's asking (identity), what they're asking from (device), and where and when they're asking (context). Toggle each one below and watch what it takes to get an ALLOW.";
 
 const CALLOUT =
   "Under the zone model from Chapter 1, being on the trusted network would have been enough on its own, none of these three signals would even be checked.";
@@ -87,7 +89,11 @@ export function TrustSignalsViz() {
         Try it: what does it take to get an ALLOW?
       </h3>
       <p className="text-ink-dim text-[14.5px] mb-4">
-        <AutoLink text={INTRO} />
+        Every rule the{' '}
+        <Link to="/sandbox" className={TOOL_LINK_CLASS}>
+          Sandbox
+        </Link>{' '}
+        <AutoLink text={INTRO_AFTER} />
       </p>
 
       <div className="space-y-3.5 mb-4">

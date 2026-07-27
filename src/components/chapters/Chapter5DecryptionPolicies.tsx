@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import clsx from 'clsx';
+import { ChapterPage } from '../layout/ChapterPage';
 import { SectionHead } from '../ui/SectionHead';
 import { Card } from '../ui/Card';
 
@@ -92,7 +93,7 @@ function PolicyEvaluator() {
 
 export function Chapter5DecryptionPolicies() {
   return (
-    <section id="ch5" className="max-w-[1080px] mx-auto px-8 py-18">
+    <ChapterPage title="Chapter 5: Policies">
       <SectionHead eyebrow="Chapter 5" title="Decryption policies">
         None of the decrypting and inspecting from Chapter 3, using whichever key exchange and cipher suite
         Chapter 4 just covered, happens unless an admin has explicitly told the firewall to do it. That
@@ -120,6 +121,6 @@ export function Chapter5DecryptionPolicies() {
       </Card>
 
       <PolicyEvaluator />
-    </section>
+    </ChapterPage>
   );
 }

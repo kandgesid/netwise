@@ -1,5 +1,8 @@
+import { Link } from 'react-router-dom';
+import { ChapterPage } from '../layout/ChapterPage';
 import { SectionHead } from '../ui/SectionHead';
 import { FirewallCheckpointViz } from './FirewallCheckpointViz';
+import { TOOL_LINK_CLASS } from '../ui/toolLinkClass';
 
 const TYPES = [
   { tag: 'Outbound', title: 'Forward proxy', text: 'Inspects traffic from your users going out to the internet.' },
@@ -9,7 +12,7 @@ const TYPES = [
 
 export function Chapter1Firewall() {
   return (
-    <section id="ch1" className="max-w-[1080px] mx-auto px-8 py-18">
+    <ChapterPage title="Chapter 1: Firewall">
       <SectionHead eyebrow="Chapter 1" title="Firewall: the secure middleman">
         A firewall sits between two networks (your device and the internet, or your company network and
         the outside world) and looks at everything that tries to pass through. Think of it less as a wall
@@ -32,7 +35,10 @@ export function Chapter1Firewall() {
         <p className="text-ink-dim text-sm">
           The same firewall plays a different role depending on which direction traffic is going, and who
           owns the destination. The chapters ahead go deep on the first two below, forward proxy and
-          inbound inspection; VPN gets its own detailed treatment in the certificate reference section
+          inbound inspection; VPN gets its own detailed treatment in the{' '}
+          <Link to="/certificates" className={TOOL_LINK_CLASS}>
+            Certificates tool
+          </Link>{' '}
           rather than a narrative chapter of its own.
         </p>
       </div>
@@ -53,6 +59,6 @@ export function Chapter1Firewall() {
         Firewalls make these decisions on cleartext traffic easily enough. Encrypted traffic is a
         different story, and that's where Chapter 2 picks up.
       </p>
-    </section>
+    </ChapterPage>
   );
 }

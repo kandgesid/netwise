@@ -8,7 +8,7 @@
 - [ ] `npm run build` passes
 - [ ] Tested locally with `npm run dev`
 - [ ] Screenshot attached below (for any visual/layout change)
-- [ ] If a new chapter: `src/App.tsx` and `NAV_LINKS` in `Header.tsx` are both updated
+- [ ] If a new chapter/tool: one entry added to `ROUTES` in `src/routes.tsx`, and the component is wrapped in `<ChapterPage>`
 - [ ] If a new acronym/glossary entry: added to `src/data/acronyms.ts` / `src/data/glossary.ts`, not hardcoded elsewhere
 
 ## Screenshot / recording (if applicable)

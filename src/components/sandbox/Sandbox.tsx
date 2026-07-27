@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { ChapterPage } from '../layout/ChapterPage';
 import { SectionHead } from '../ui/SectionHead';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
@@ -118,7 +119,7 @@ export function Sandbox() {
   }
 
   return (
-    <section id="sandbox" className="max-w-[1080px] mx-auto px-8 py-18">
+    <ChapterPage title="Sandbox">
       <SectionHead eyebrow="Practice" title="Build a rule. Break it. Fix it.">
         This is the core idea firewalls are built on, and the same one Chapter 7's Zero Trust reframing
         leans on hardest: a rule written for a port number can be fooled, a rule written for an actual
@@ -284,6 +285,6 @@ export function Sandbox() {
           </Button>
         </Card>
       </div>
-    </section>
+    </ChapterPage>
   );
 }
