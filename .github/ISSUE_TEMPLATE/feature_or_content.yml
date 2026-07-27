@@ -1,0 +1,70 @@
+name: Chapter / content proposal
+description: Propose a new chapter, sandbox scenario, glossary entry, or other content addition
+title: "[Content]: "
+labels: ["content", "enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for proposing new content for Netwise! This is the main way
+        the project grows, and you don't need to know the codebase to
+        propose an idea — domain knowledge is the valuable part. See
+        `CONTRIBUTING.md` for how content additions are actually implemented
+        once an idea is agreed on.
+
+  - type: dropdown
+    id: type
+    attributes:
+      label: What kind of addition is this?
+      options:
+        - New chapter
+        - New glossary entry / category
+        - New acronym tooltip
+        - New sandbox scenario or rule option
+        - New certificate reference entry
+        - Correction to existing content
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What's the topic, and why does it belong in Netwise?
+      placeholder: e.g. "A chapter on VPN split tunneling, covering the tradeoff between routing all traffic through the tunnel vs. only some of it."
+    validations:
+      required: true
+
+  - type: textarea
+    id: outline
+    attributes:
+      label: Rough outline or content
+      description: >
+        For a new chapter: a rough outline of the sections/points it would
+        cover. For a glossary/acronym entry: the term and a draft
+        definition. For a correction: what's currently wrong and what it
+        should say instead.
+    validations:
+      required: true
+
+  - type: textarea
+    id: where
+    attributes:
+      label: Where it fits
+      description: >
+        If a new chapter, where in the existing narrative order does it
+        belong (before/after which chapter)? If a glossary entry, which
+        category (firewall / tls / vpn / a new one)?
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: willing
+    attributes:
+      label: Contribution
+      options:
+        - label: I'd like to implement this myself and open a PR
+          required: false
+        - label: I'm proposing this for someone else to pick up
+          required: false
