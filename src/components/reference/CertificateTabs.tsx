@@ -4,9 +4,10 @@ import { SectionHead } from '../ui/SectionHead';
 import { Card } from '../ui/Card';
 import { Toggle } from '../ui/Toggle';
 import { AutoLink } from '../../lib/autoLink';
-import { CERT_DATA, CERT_LIFECYCLE_BRIDGE, CERT_LIFECYCLE_SECTIONS, CERT_LIFECYCLE_CLOSING, type CertTab } from '../../data/certificates';
+import { CERT_DATA, CERT_LIFECYCLE_BRIDGE, CERT_LIFECYCLE_SECTIONS, CERT_LIFECYCLE_CLOSING, CERT_CHAIN_BRIDGE, CERT_CHAIN_SECTIONS, type CertTab } from '../../data/certificates';
 import { CertificateFieldDecoder } from './CertificateFieldDecoder';
 import { VerificationWalkthrough } from './VerificationWalkthrough';
+import { ChainOfTrustDiagram } from './ChainOfTrustDiagram';
 
 const TAB_OPTIONS: { value: CertTab; label: string }[] = [
   { value: 'forward', label: 'Forward proxy' },
@@ -49,6 +50,31 @@ export function CertificateTabs() {
           </ul>
         </div>
       </Card>
+
+      <p className="text-ink-dim text-[14.5px] mt-6 mb-5 max-w-[70ch]">
+        <AutoLink text={CERT_CHAIN_BRIDGE} />
+      </p>
+
+      {CERT_CHAIN_SECTIONS.map((section) => (
+        <Card key={section.heading} className="mb-5">
+          <h3 className="font-sans font-semibold text-base mb-2">
+            <AutoLink text={section.heading} />
+          </h3>
+          <p className="text-ink-dim text-[14.5px] mb-2.5">
+            <AutoLink text={section.intro} />
+          </p>
+          <ul className="pl-4 text-ink-dim text-[14.5px] space-y-2.5 list-disc marker:text-line">
+            {section.points.map((p, idx) => (
+              <li key={idx}>
+                {p.strong && <strong className="text-ink">{p.strong} </strong>}
+                <AutoLink text={p.text} />
+              </li>
+            ))}
+          </ul>
+        </Card>
+      ))}
+
+      <ChainOfTrustDiagram />
 
       <p className="text-ink-dim text-[14.5px] mt-6 mb-5 max-w-[70ch]">
         <AutoLink text={CERT_LIFECYCLE_BRIDGE} />

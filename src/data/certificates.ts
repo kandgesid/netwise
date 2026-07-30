@@ -82,3 +82,23 @@ export const CERT_LIFECYCLE_SECTIONS: LifecycleSection[] = [
 ];
 
 export const CERT_LIFECYCLE_CLOSING = "Put the two together and it's really one story: roots stay put for decades because replacing one is disruptive everywhere at once, leaves now live for weeks because renewing one got automated, and revocation checking is being redesigned around exactly that same shift.";
+
+// --- Chain of trust basics (phase-4) ---
+// What root/intermediate/leaf structurally are, and why the chain is checked leaf-up-to-root. Lives above
+// CERT_LIFECYCLE_SECTIONS because that content (and VerificationWalkthrough further down the page) both
+// assume this vocabulary already. See docs/integration/phase-4-chain-of-trust-basics/content-plan.md.
+
+export const CERT_CHAIN_BRIDGE = "Whichever job a certificate is doing above, it never stands alone. Every certificate on this page is actually the bottom of a three-tier chain, and the terms that chain runs on are worth pinning down before going further.";
+
+export const CERT_CHAIN_SECTIONS: LifecycleSection[] = [
+  {
+    heading: 'A certificate is trusted because of the chain behind it, not on its own',
+    intro: "That chain has three tiers, root, intermediate, and leaf, and each one exists to solve a different problem: who a client trusts blindly, who does the actual day-to-day signing, and who's actually being identified.",
+    points: [
+      { strong: 'Root:', text: "the top of the chain, and the only certificate in it that isn't signed by anyone else, it's self-signed. A fixed set of these comes pre-installed in every operating system and browser as a trust anchor: something the client already trusts by default, because whoever built the OS or browser decided it should. Nothing vouches for a root; that's what makes it one." },
+      { strong: 'Intermediate:', text: "signed by a root, and it exists mainly to keep the root out of everyday use. If a root's own key had to sign every server certificate directly, that key would be in constant, active use, which makes it a bigger target and makes a compromise catastrophic, recovering means getting every device on the internet to stop trusting that root and pick up a new one. An intermediate absorbs that risk instead. It does the routine signing, and if it's ever compromised, only that intermediate has to be revoked and replaced. The root underneath it never has to move." },
+      { strong: 'Leaf:', text: "the certificate that actually identifies one specific server, portal.netwise-example.test, or whatever site is actually being connected to. It's signed by an intermediate, not a root, and it's the only certificate in the chain a client hasn't already decided to trust ahead of time. Everything else in the chain exists to justify trusting this one." },
+      { strong: 'Why leaf-to-root:', text: "a client can't start from something it already trusts and work forward, because it has no way to know in advance which leaf certificate a given site is about to present. What it does know ahead of time is a fixed list of trusted roots. So it starts at the one certificate it just received, the leaf, confirms that certificate's signature actually traces to the intermediate that issued it, confirms that intermediate's own signature traces to a root, and only trusts the connection if that walk lands on a root already sitting in its trust store. That's the exact order the walkthrough further down this page runs the check in." },
+    ],
+  },
+];
