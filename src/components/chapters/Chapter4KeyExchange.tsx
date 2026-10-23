@@ -3,6 +3,7 @@ import { ChapterPage } from '../layout/ChapterPage';
 import { SectionHead } from '../ui/SectionHead';
 import { Card } from '../ui/Card';
 import { CipherDecoder } from './CipherDecoder';
+import { KeyExchangeDiagram } from './KeyExchangeDiagram';
 import { AutoLink } from '../../lib/autoLink';
 
 const KEY_THEFT_IMPACT: {
@@ -76,29 +77,13 @@ export function Chapter4KeyExchange() {
 
       <Card className="mb-5">
         <h3 className="font-sans font-semibold text-base mb-2.5">Key exchange groups</h3>
-        <p className="text-ink-dim text-[14.5px] mb-2.5">
-          Both sides combine public values so each can independently compute the same shared secret, without
-          ever sending that secret over the wire. Here's the actual mechanism, step by step:
+        <p className="text-ink-dim text-[14.5px] mb-3">
+          Both sides combine public values so each can independently compute the same shared secret,
+          without ever sending that secret over the wire:
         </p>
-        <ol className="pl-4 text-ink-dim text-[14.5px] space-y-1.5 list-decimal marker:text-line mb-3">
-          <li>Each side generates its own ephemeral key pair, brand new, just for this one connection.</li>
-          <li>Both sides send their public key across, in the clear, right inside the handshake.</li>
-          <li>
-            Each side combines its own private key with the other side's public key. Because of how
-            elliptic-curve math works, both land on the exact same shared secret, without that secret itself
-            ever crossing the wire.
-          </li>
-          <li>
-            That shared secret feeds a key-derivation function, producing the actual encryption and
-            integrity keys used for the rest of the session.
-          </li>
-          <li>
-            Both ephemeral private keys get thrown away immediately after. Nothing is left anywhere that
-            could reconstruct this session's keys later.
-          </li>
-        </ol>
-        <p className="text-ink-dim text-[14.5px]">
-          <AutoLink text="That's what the E in ECDHE and DHE stands for, ephemeral, and step 5 above is the whole mechanism behind forward secrecy: there's nothing left to steal after the fact. Common groups in use today: X25519 and secp256r1 (also called P-256). The decoder below lets you toggle the first chip to see what a post-quantum-hybrid version of X25519 looks like." />
+        <KeyExchangeDiagram />
+        <p className="text-ink-dim text-[14.5px] mt-3.5">
+          <AutoLink text="That's what the E in ECDHE and DHE stands for, ephemeral: there's nothing left to steal after the fact. Common groups in use today: X25519 and secp256r1 (also called P-256). The decoder below lets you toggle the first chip to see what a post-quantum-hybrid version of X25519 looks like." />
         </p>
       </Card>
 

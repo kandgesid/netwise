@@ -7,6 +7,7 @@ import { TOOL_LINK_CLASS } from '../ui/toolLinkClass';
 import { AutoLink } from '../../lib/autoLink';
 import { HandshakeStepper } from './HandshakeStepper';
 import { SinglePassViz } from './SinglePassViz';
+import { HandshakeSequenceDiagram } from './HandshakeSequenceDiagram';
 
 const TOC_ITEMS = [
   { id: 'tls-versions', label: 'TLS 1.2 vs 1.3' },
@@ -16,22 +17,18 @@ const TOC_ITEMS = [
   { id: 'ech', label: 'Encrypted Client Hello' },
 ];
 
-const TLS12_STEPS = [
-  'ClientHello — proposes the TLS version, random bytes, and which cipher suites it supports.',
-  'ServerHello — server picks one cipher suite from that list and sends its own random bytes.',
-  'Certificate — server sends its certificate, in the clear.',
-  "ServerKeyExchange — server's ephemeral public key, signed with its long-term private key. Only shows up at all if the chosen cipher suite is ECDHE or DHE.",
-  "ClientKeyExchange — client sends its own half of the key exchange.",
-  'Both sides independently compute the same shared secret from what they just exchanged.',
-  'ChangeCipherSpec + Finished, both directions — a last integrity check, and the first thing actually sent encrypted.',
+const TLS12_MESSAGES: { direction: 'left' | 'right'; label: string; encrypted?: boolean; annotate?: string }[] = [
+  { direction: 'right', label: 'ClientHello' },
+  { direction: 'left', label: 'ServerHello, Certificate, ServerKeyExchange, ServerHelloDone' },
+  { direction: 'right', label: 'ClientKeyExchange, ChangeCipherSpec, Finished', encrypted: true },
+  { direction: 'left', label: 'ChangeCipherSpec, Finished', encrypted: true },
 ];
 
-const TLS13_STEPS = [
-  "ClientHello — now carries the client's key share up front, not just a list of cipher suite options.",
-  "ServerHello — server's key share comes back immediately. Both sides derive the shared secret right here.",
-  'Everything from this point on is encrypted, including the certificate itself.',
-  'EncryptedExtensions, Certificate, CertificateVerify, Finished — sent as one encrypted block.',
-  "Client's own Finished closes out the handshake.",
+const TLS13_MESSAGES: { direction: 'left' | 'right'; label: string; encrypted?: boolean; annotate?: string }[] = [
+  { direction: 'right', label: 'ClientHello + key share' },
+  { direction: 'left', label: 'ServerHello + key share', annotate: 'shared secret computed here' },
+  { direction: 'left', label: 'EncryptedExtensions, Certificate, CertificateVerify, Finished', encrypted: true },
+  { direction: 'right', label: 'Finished', encrypted: true },
 ];
 
 const PIPELINE_POINTS = [
@@ -120,25 +117,12 @@ export function Chapter3Handshake() {
       <Card id="tls-versions" className="mb-6">
         <h3 className="font-sans font-semibold text-base mb-2">TLS 1.2 vs. TLS 1.3, the actual sequence</h3>
         <p className="text-ink-dim text-[14.5px] mb-3.5">
-          <AutoLink text="The stepper above shows one firewall-centric path through a handshake. Here's the handshake itself, message by message, both versions side by side." />
+          The stepper above shows one firewall-centric path. Here's the handshake itself, message by
+          message, both versions side by side:
         </p>
         <div className="grid md:grid-cols-2 gap-4 mb-3.5">
-          <div>
-            <h4 className="font-mono text-xs uppercase tracking-[0.1em] text-ink-faint mb-2">TLS 1.2 — 2 round trips</h4>
-            <ol className="pl-4 text-ink-dim text-[13.5px] space-y-1.5 list-decimal marker:text-line">
-              {TLS12_STEPS.map((s, i) => (
-                <li key={i}><AutoLink text={s} /></li>
-              ))}
-            </ol>
-          </div>
-          <div>
-            <h4 className="font-mono text-xs uppercase tracking-[0.1em] text-ink-faint mb-2">TLS 1.3 — 1 round trip</h4>
-            <ol className="pl-4 text-ink-dim text-[13.5px] space-y-1.5 list-decimal marker:text-line">
-              {TLS13_STEPS.map((s, i) => (
-                <li key={i}><AutoLink text={s} /></li>
-              ))}
-            </ol>
-          </div>
+          <HandshakeSequenceDiagram title="TLS 1.2" roundTrips={2} messages={TLS12_MESSAGES} />
+          <HandshakeSequenceDiagram title="TLS 1.3" roundTrips={1} messages={TLS13_MESSAGES} />
         </div>
         <p className="text-ink-faint text-[13px]">
           <AutoLink text="Fewer messages, encryption starting earlier, and one path removed entirely: TLS 1.3 only allows the ephemeral kind of key exchange, so static RSA key exchange has nowhere left to run. That's exactly why one path through the inbound-inspection scenario above, a server that's negotiated TLS 1.3, always lands on the active-participant mechanism rather than a quiet decrypt." />
