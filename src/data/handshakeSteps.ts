@@ -15,6 +15,21 @@ export interface ScenarioData {
   /** Shown instead of `note` when the ECH toggle is on. Only defined on the `passthrough` entry. */
   echNote?: string;
   steps: Step[];
+  /**
+   * Shown instead of `note` when the key-exchange toggle is set to 'ecdhe'. Only defined on the
+   * `inbound` entry — the one scenario where the server's negotiated key-exchange algorithm
+   * changes what the firewall structurally has to do (see `kexSteps`).
+   */
+  kexNote?: string;
+  /**
+   * Shown instead of `steps` when the key-exchange toggle is set to 'ecdhe'. Only defined on the
+   * `inbound` entry. Unlike `echBody` (a per-step text swap within one shared sequence), this is a
+   * full alternate sequence, because ECDHE inbound inspection isn't a cosmetic variant of the
+   * static-RSA path, it's a structurally different handshake (the firewall runs two independent DH
+   * exchanges instead of passively deriving one key). `pos` values in this array are independent of
+   * `steps`' pos values.
+   */
+  kexSteps?: Step[];
 }
 
 export const SCENARIOS: Record<ScenarioMode, ScenarioData> = {
@@ -48,14 +63,28 @@ export const SCENARIOS: Record<ScenarioMode, ScenarioData> = {
   },
   inbound: {
     label: 'Inbound inspection',
-    note: 'The firewall isn\'t spoofing anything here. It holds the real server\'s own private key, which can let it derive the session key and decrypt a copy in place, without ever changing what the client sees, though whether that actually works depends on which key exchange the server negotiates (the key-derivation step below explains the catch).',
+    note: "The firewall isn't spoofing anything here. It holds the real server's own private key the whole time, and what that key actually buys depends on which key exchange the server negotiates: a quiet decrypt with the same key everyone else derives, or something more active. Toggle below to see both.",
+    kexNote: "The server negotiated an ephemeral (ECDHE/DHE) key exchange, so a static copy of its private key no longer lets the firewall passively derive the session key the way it could with plain RSA. To still inspect this traffic, the firewall has to become an active participant in two separate Diffie-Hellman exchanges, one with the client, one with the server, and prove its identity on the client-facing leg by signing with the server's real private key. Two independent shared secrets come out of this, not one, which is exactly how outbound forward proxy works too (two sessions stitched together) — the difference here is the firewall authenticates with the server's own key instead of a forged certificate.",
     steps: [
       { pos: 20, label: 'TCP handshake', title: 'Client ↔ server', body: 'Client opens a TCP connection addressed to the real server the whole time. The firewall sits inline but doesn\'t terminate anything itself.' },
       { pos: 35, label: 'TLS handshake', title: 'ClientHello', body: 'Client sends ClientHello, addressed to the real server.' },
       { pos: 55, label: 'TLS handshake', title: 'ServerHello + the real certificate', body: 'The server responds with its actual, valid public certificate, exactly what the client would see with no firewall involved at all.' },
-      { pos: 60, label: 'Key derivation', title: 'Firewall computes the same session key (with static RSA)', body: 'Because the firewall was given the server\'s private key ahead of time, it can independently derive the same session key being negotiated, without inserting itself as a third party into the handshake. This works cleanly as long as the negotiated cipher suite uses plain RSA key exchange. If the server negotiates an ephemeral (ECDHE/DHE) exchange instead, the forward-secrecy mode covered in Chapter 4, the static private key alone isn\'t enough to derive the session key, which is why real inbound-decryption deployments often have to restrict which cipher suites the server offers.' },
+      { pos: 60, label: 'Key derivation', title: 'Firewall computes the same session key (with static RSA)', body: "Because the firewall was given the server's private key ahead of time, it can independently derive the same session key being negotiated, without inserting itself as a third party into the handshake. This works cleanly as long as the negotiated cipher suite uses plain RSA key exchange. If the server negotiates an ephemeral (ECDHE/DHE) exchange instead, the static private key alone isn't enough — toggle to ECDHE below to see what the firewall has to do instead." },
       { pos: 65, label: 'Session established', title: 'Inline decrypt', body: 'Once the handshake finishes (and assuming the cipher suite allowed it, per the previous step), the firewall decrypts a copy of the traffic in place using that derived key and runs full App-ID, User-ID, and Content-ID inspection on it.' },
       { pos: 85, label: 'Policy decision', title: 'Delivered unchanged', body: 'Traffic reaches the server exactly as sent. The client and server never see anything different from a normal, direct connection.' },
+    ],
+    kexSteps: [
+      { pos: 20, label: 'TCP handshake', title: 'Client ↔ server', body: 'Client opens a TCP connection addressed to the real server, same as always. The firewall sits inline — but this time it can\'t just watch and derive a key afterward, it has to step into the handshake itself.' },
+      { pos: 32, label: 'TLS handshake (leg 1)', title: 'ClientHello', body: 'Client sends ClientHello, listing ECDHE/DHE-capable cipher suites. This never reaches the server directly.' },
+      { pos: 50, label: 'Firewall as active participant', title: 'Firewall generates two ephemeral key pairs', body: "A static private key can't produce an ECDHE session key, so the firewall generates its own fresh ephemeral key pair for the client-facing leg, and a separate one for the server-facing leg. These two legs will end up with two different shared secrets." },
+      { pos: 62, label: 'TLS handshake (leg 2)', title: 'Firewall → server: firewall acts as the client', body: 'The firewall opens its own TLS handshake to the real server, this time playing the client role, and sends its leg-2 ephemeral public key share.' },
+      { pos: 72, label: 'TLS handshake (leg 2)', title: 'Server responds with its own ephemeral key share', body: 'The server replies with ServerHello and its ephemeral ECDHE public key, exactly as it would to any client.' },
+      { pos: 62, label: 'Key derivation (leg 2)', title: 'shared_2 established', body: "Firewall computes shared_2 = DH(firewall_leg2_private, server_public). The real server computes the same value from its side. This secret belongs only to the firewall↔server leg — the client's keys play no part in it." },
+      { pos: 38, label: 'TLS handshake (leg 1)', title: 'Firewall → client: real certificate + signed key share', body: "Back on the client-facing leg, the firewall sends the server's actual, real certificate, not a forged one like outbound forward proxy uses, along with its own leg-1 ephemeral public key share. Critically, it signs that key share using the server's real private key." },
+      { pos: 38, label: 'Signature check', title: 'Client verifies the signature', body: "The client checks that signature against the public key on the server's real certificate. It passes, because the firewall actually holds the matching private key, so from the client's side this looks exactly like talking to the real server directly. This is the one step the static-RSA path never needed." },
+      { pos: 38, label: 'Key derivation (leg 1)', title: 'shared_1 established', body: 'Client computes shared_1 = DH(client_private, firewall_leg1_public). The firewall independently computes the same value using its leg-1 ephemeral private key. Two separate shared secrets now exist: shared_1 (client ↔ firewall) and shared_2 (firewall ↔ server).' },
+      { pos: 65, label: 'Session established', title: 'Inline decrypt, now via two live key exchanges', body: 'The firewall decrypts traffic on session 1 using shared_1, inspects it, then re-encrypts with shared_2 before forwarding to the server, and the reverse on the way back. Same inspection outcome as the static-RSA path, achieved by active participation instead of passive key reuse.' },
+      { pos: 85, label: 'Policy decision', title: 'Delivered unchanged', body: "Traffic reaches the server exactly as sent. The client and server never see anything different from a normal, direct connection — what makes that possible is the server's signature on the firewall's key share, not anything the client would flag as unusual." },
     ],
   },
 };

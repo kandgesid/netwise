@@ -69,12 +69,20 @@ export const ROUTE_META: RouteMeta[] = [
     chapterNumber: 6,
   },
   {
+    path: '/chapters/key-protection',
+    navLabel: 'Key protection',
+    description: "Why the keys a firewall now holds, the forward-trust CA and the server's own signing key, are worth protecting as hard as anything they protect — HSMs, master-key encryption, and short-lived certificates, and what hardware, software, and cloud form factors each change about that.",
+    group: 'course',
+    order: 7,
+    chapterNumber: 7,
+  },
+  {
     path: '/chapters/zero-trust',
     navLabel: 'Zero Trust',
     description: 'What changes once being inside a zone stops being proof of anything by itself.',
     group: 'course',
-    order: 7,
-    chapterNumber: 7,
+    order: 8,
+    chapterNumber: 8,
   },
   {
     path: '/sandbox',

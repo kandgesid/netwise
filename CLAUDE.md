@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-Netwise is an interactive, simulation-based learning environment for network and security fundamentals: seven narrative chapters (firewall basics → what a firewall does → SSL/TLS handshake → key exchange & cipher suites → decryption policies → forward proxy deep dive → Zero Trust), a hands-on firewall rule sandbox, a certificate-use-case reference, and a searchable glossary with hover tooltips on every acronym. It's a routed multi-page site (`react-router-dom`, `HashRouter`) — a hub/landing page at `/` links out to one route per chapter/tool, each rendered inside a persistent shell with a collapsible sidebar. See "Routing & page structure" below.
+Netwise is an interactive, simulation-based learning environment for network and security fundamentals: eight narrative chapters (firewall basics → what a firewall does → SSL/TLS handshake → key exchange & cipher suites → decryption policies → forward proxy deep dive → key protection → Zero Trust), a hands-on firewall rule sandbox, a certificate-use-case reference, and a searchable glossary with hover tooltips on every acronym. It's a routed multi-page site (`react-router-dom`, `HashRouter`) — a hub/landing page at `/` links out to one route per chapter/tool, each rendered inside a persistent shell with a collapsible sidebar. See "Routing & page structure" below.
 
 ## Commands
 
@@ -48,7 +48,7 @@ There is no test suite/framework configured in this repo.
 
 **Adding a new chapter or tool is mechanical by design:**
 1. Add a data file under `src/data/` if it needs its own content.
-2. Create `src/components/chapters/Chapter8Whatever.tsx` (or a tool under `components/sandbox`/`components/reference`), using an existing chapter (e.g. `Chapter5DecryptionPolicies.tsx`) as a template. Wrap the returned JSX in `<ChapterPage title="...">...</ChapterPage>` instead of a raw `<section>` — `ChapterPage` owns the container styling, the page-title side effect, the "Chapter N of M" indicator, and the prev/next footer (computed automatically from `routes.tsx`).
+2. Create `src/components/chapters/Chapter9Whatever.tsx` (or a tool under `components/sandbox`/`components/reference`), using an existing chapter (e.g. `Chapter5DecryptionPolicies.tsx`) as a template. Wrap the returned JSX in `<ChapterPage title="...">...</ChapterPage>` instead of a raw `<section>` — `ChapterPage` owns the container styling, the page-title side effect, the "Chapter N of M" indicator, and the prev/next footer (computed automatically from `routes.tsx`).
 3. Add one entry to the `ROUTES` array in `src/routes.tsx`. That's the only other file that needs a change — it shows up in the sidebar, the home page, and prev/next automatically.
 4. For a heavy chapter (4+ `<Card>` sections), optionally add a `<ChapterTOC items={[...]} />` right after `<SectionHead>` and give each `<Card>` a matching `id` prop — see `Chapter3Handshake.tsx` for the pattern.
 

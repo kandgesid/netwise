@@ -60,12 +60,12 @@ be a small, mechanical change:
 
 1. If the chapter needs its own structured content (like the handshake steps
    or cipher suite parts do), add a data file under `src/data/`.
-2. Create `src/components/chapters/Chapter8Whatever.tsx`. Use an existing
+2. Create `src/components/chapters/Chapter9Whatever.tsx`. Use an existing
    chapter as a template — `src/components/chapters/Chapter5DecryptionPolicies.tsx`
    is a good simple one to copy from. Use `<SectionHead>` for the intro,
    `<Card>` for content blocks, and `<AutoLink text={...} />` (see below) for
    any copy that might contain an acronym. Wrap the whole thing in
-   `<ChapterPage title="Chapter 8: Whatever">...</ChapterPage>` instead of a
+   `<ChapterPage title="Chapter 9: Whatever">...</ChapterPage>` instead of a
    raw `<section>` — it owns the container styling, the page title, the
    "Chapter N of M" indicator, and the prev/next footer, all computed
    automatically from `src/routes.tsx`.

@@ -6,7 +6,8 @@ import { Chapter3Handshake } from './components/chapters/Chapter3Handshake';
 import { Chapter4KeyExchange } from './components/chapters/Chapter4KeyExchange';
 import { Chapter5DecryptionPolicies } from './components/chapters/Chapter5DecryptionPolicies';
 import { Chapter6ForwardProxy } from './components/chapters/Chapter6ForwardProxy';
-import { Chapter7ZeroTrust } from './components/chapters/Chapter7ZeroTrust';
+import { Chapter7KeyProtection } from './components/chapters/Chapter7KeyProtection';
+import { Chapter8ZeroTrust } from './components/chapters/Chapter8ZeroTrust';
 import { Sandbox } from './components/sandbox/Sandbox';
 import { CertificateTabs } from './components/reference/CertificateTabs';
 import { Glossary } from './components/reference/Glossary';
@@ -26,7 +27,8 @@ const ELEMENTS: Record<string, ReactNode> = {
   '/chapters/key-exchange': <Chapter4KeyExchange />,
   '/chapters/policies': <Chapter5DecryptionPolicies />,
   '/chapters/forward-proxy': <Chapter6ForwardProxy />,
-  '/chapters/zero-trust': <Chapter7ZeroTrust />,
+  '/chapters/key-protection': <Chapter7KeyProtection />,
+  '/chapters/zero-trust': <Chapter8ZeroTrust />,
   '/sandbox': <Sandbox />,
   '/certificates': <CertificateTabs />,
   '/glossary': <Glossary />,

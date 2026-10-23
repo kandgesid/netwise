@@ -1,8 +1,38 @@
+import clsx from 'clsx';
 import { ChapterPage } from '../layout/ChapterPage';
 import { SectionHead } from '../ui/SectionHead';
 import { Card } from '../ui/Card';
 import { CipherDecoder } from './CipherDecoder';
 import { AutoLink } from '../../lib/autoLink';
+
+const KEY_THEFT_IMPACT: {
+  condition: string;
+  pastTraffic: { verdict: 'safe' | 'compromised'; text: string };
+  futureTraffic: { verdict: 'at-risk'; text: string };
+}[] = [
+  {
+    condition: 'With PFS (ECDHE/DHE)',
+    pastTraffic: {
+      verdict: 'safe',
+      text: "Protected. The private key was only ever used to sign the ephemeral exchange, never to encrypt anything directly, and the ephemeral keys that actually protected each past session were destroyed right after that session's handshake finished. There's nothing left for a stolen key to unlock.",
+    },
+    futureTraffic: {
+      verdict: 'at-risk',
+      text: "Not protected. Anyone holding the private key can sign a new ephemeral exchange and convince a new client it's really talking to the server, the exact mechanism the inbound-inspection firewall in Chapter 3 legitimately relies on. PFS was never a defense against impersonation, only against decrypting old traffic.",
+    },
+  },
+  {
+    condition: 'Without PFS (static RSA)',
+    pastTraffic: {
+      verdict: 'compromised',
+      text: "Fully exposed. Every past session's pre-master secret was encrypted directly with this public key, so the stolen private key decrypts all of it retroactively, no new handshake required. (Heartbleed, 2014, is the textbook real-world case.)",
+    },
+    futureTraffic: {
+      verdict: 'at-risk',
+      text: "Same exposure as the PFS row above — a stolen key lets an attacker impersonate the server either way. PFS changes nothing about future risk; it only changes whether past traffic is also exposed.",
+    },
+  },
+];
 
 const PQ_POINTS = [
   {
@@ -47,29 +77,84 @@ export function Chapter4KeyExchange() {
       <Card className="mb-5">
         <h3 className="font-sans font-semibold text-base mb-2.5">Key exchange groups</h3>
         <p className="text-ink-dim text-[14.5px] mb-2.5">
-          Both sides combine public values so each can independently compute the same shared secret,
-          without ever sending that secret over the wire.
+          Both sides combine public values so each can independently compute the same shared secret, without
+          ever sending that secret over the wire. Here's the actual mechanism, step by step:
         </p>
-        <ul className="pl-4 text-ink-dim text-[14.5px] space-y-2 list-disc marker:text-line">
+        <ol className="pl-4 text-ink-dim text-[14.5px] space-y-1.5 list-decimal marker:text-line mb-3">
+          <li>Each side generates its own ephemeral key pair, brand new, just for this one connection.</li>
+          <li>Both sides send their public key across, in the clear, right inside the handshake.</li>
           <li>
-            Modern TLS almost always uses an <strong className="text-ink">ephemeral</strong> version,
-            written as <AutoLink text="ECDHE or DHE" /> (the "E" is for ephemeral). A brand-new key pair is
-            generated just for this one session, then thrown away afterward.
+            Each side combines its own private key with the other side's public key. Because of how
+            elliptic-curve math works, both land on the exact same shared secret, without that secret itself
+            ever crossing the wire.
           </li>
           <li>
-            That's what gives TLS <strong className="text-ink">forward secrecy</strong>: stealing tomorrow's
-            key doesn't unlock today's sessions, since the keys that actually protected them never get
-            written down anywhere.
+            That shared secret feeds a key-derivation function, producing the actual encryption and
+            integrity keys used for the rest of the session.
           </li>
           <li>
-            Common groups in use today: <strong className="text-ink">X25519</strong> and{' '}
-            <strong className="text-ink">secp256r1</strong> (also called P-256). The decoder below lets
-            you toggle the first chip to see what a post-quantum-hybrid version of X25519 looks like.
+            Both ephemeral private keys get thrown away immediately after. Nothing is left anywhere that
+            could reconstruct this session's keys later.
           </li>
-        </ul>
+        </ol>
+        <p className="text-ink-dim text-[14.5px]">
+          <AutoLink text="That's what the E in ECDHE and DHE stands for, ephemeral, and step 5 above is the whole mechanism behind forward secrecy: there's nothing left to steal after the fact. Common groups in use today: X25519 and secp256r1 (also called P-256). The decoder below lets you toggle the first chip to see what a post-quantum-hybrid version of X25519 looks like." />
+        </p>
       </Card>
 
       <CipherDecoder />
+
+      <Card className="mb-5">
+        <h3 className="font-sans font-semibold text-base mb-2">What forward secrecy doesn't protect</h3>
+        <p className="text-ink-dim text-[14.5px] mb-2.5">
+          <AutoLink text="Forward secrecy above is specifically about sessions that already finished. It says nothing about what a stolen key still lets an attacker do going forward, and conflating the two is an easy way to end up thinking a stolen key is basically harmless once PFS is involved. It isn't." />
+        </p>
+        <div className="overflow-x-auto">
+          <table className="w-full text-[13px] border-collapse">
+            <thead>
+              <tr className="text-left font-mono text-[11px] uppercase tracking-wide text-ink-faint">
+                <th className="py-2 pr-3 border-b border-line-soft"> </th>
+                <th className="py-2 pr-3 border-b border-line-soft">Past traffic</th>
+                <th className="py-2 border-b border-line-soft">Future traffic</th>
+              </tr>
+            </thead>
+            <tbody>
+              {KEY_THEFT_IMPACT.map((row) => (
+                <tr key={row.condition} className="align-top">
+                  <td className="py-3 pr-3 border-b border-line-soft font-semibold text-ink">
+                    {row.condition}
+                  </td>
+                  <td
+                    className={clsx(
+                      'py-3 pr-3 border-b border-line-soft',
+                      row.pastTraffic.verdict === 'safe' ? 'text-accent' : 'text-danger'
+                    )}
+                  >
+                    <span className="font-mono text-[11px] uppercase block mb-1">
+                      {row.pastTraffic.verdict === 'safe' ? 'Safe' : 'Compromised'}
+                    </span>
+                    <span className="text-ink-dim font-normal text-[12.5px]">
+                      <AutoLink text={row.pastTraffic.text} />
+                    </span>
+                  </td>
+                  <td className="py-3 border-b border-line-soft text-danger">
+                    <span className="font-mono text-[11px] uppercase block mb-1">At risk</span>
+                    <span className="text-ink-dim font-normal text-[12.5px]">
+                      <AutoLink text={row.futureTraffic.text} />
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p className="text-ink-faint text-[13px] mt-3">
+          Real example: Heartbleed (2014) leaked private keys from live servers and exposed years of past
+          traffic specifically because most of the web was still running static RSA key exchange at the
+          time. The same bug today, against a server running ECDHE, would still hand an attacker the ability
+          to impersonate that server going forward, just not a time machine into its past traffic.
+        </p>
+      </Card>
 
       <Card className="mb-5">
         <h3 className="font-sans font-semibold text-base mb-2">What changes next: post-quantum key exchange</h3>

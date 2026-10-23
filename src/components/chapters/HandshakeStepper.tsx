@@ -18,22 +18,41 @@ const ECH_OPTIONS: { value: EchState; label: string }[] = [
   { value: 'on', label: 'ECH on' },
 ];
 
+type KexState = 'static' | 'ecdhe';
+const KEX_OPTIONS: { value: KexState; label: string }[] = [
+  { value: 'static', label: 'Static RSA' },
+  { value: 'ecdhe', label: 'ECDHE (PFS)' },
+];
+
 export function HandshakeStepper() {
   const [mode, setMode] = useState<ScenarioMode>('passthrough');
   const [i, setI] = useState(0);
   const [ech, setEch] = useState<EchState>('off');
+  const [kex, setKex] = useState<KexState>('static');
 
   const scenario = SCENARIOS[mode];
-  const step = scenario.steps[i];
-  const isLast = i === scenario.steps.length - 1;
   const echOn = mode === 'passthrough' && ech === 'on';
+  const kexOn = mode === 'inbound' && kex === 'ecdhe';
+  const activeSteps = kexOn && scenario.kexSteps ? scenario.kexSteps : scenario.steps;
+  const step = activeSteps[i];
+  const isLast = i === activeSteps.length - 1;
   const displayedBody = echOn && step.echBody ? step.echBody : step.body;
-  const displayedNote = echOn && scenario.echNote ? scenario.echNote : scenario.note;
+  const displayedNote = echOn && scenario.echNote
+    ? scenario.echNote
+    : kexOn && scenario.kexNote
+      ? scenario.kexNote
+      : scenario.note;
 
   function changeMode(next: ScenarioMode) {
     setMode(next);
     setI(0);
     setEch('off');
+    setKex('static');
+  }
+
+  function changeKex(next: KexState) {
+    setKex(next);
+    setI(0);
   }
 
   return (
@@ -48,6 +67,14 @@ export function HandshakeStepper() {
             Encrypted Client Hello (ECH)
           </label>
           <Toggle options={ECH_OPTIONS} value={ech} onChange={setEch} />
+        </div>
+      )}
+      {mode === 'inbound' && (
+        <div className="mb-5 pl-3 border-l border-line-soft max-w-[220px]">
+          <label className="block font-mono text-[10.5px] text-ink-faint mb-1">
+            Server's key exchange
+          </label>
+          <Toggle options={KEX_OPTIONS} value={kex} onChange={changeKex} />
         </div>
       )}
       <div className="text-[13px] text-ink-faint leading-relaxed mb-5">
@@ -74,7 +101,7 @@ export function HandshakeStepper() {
       </div>
 
       <div className="flex gap-1 mb-6">
-        {scenario.steps.map((_, idx) => (
+        {activeSteps.map((_, idx) => (
           <div
             key={idx}
             className={`h-[3px] flex-1 rounded-sm ${idx <= i ? 'bg-accent' : 'bg-line-soft'}`}

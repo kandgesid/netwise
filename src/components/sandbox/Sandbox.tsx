@@ -121,7 +121,7 @@ export function Sandbox() {
   return (
     <ChapterPage title="Sandbox">
       <SectionHead eyebrow="Practice" title="Build a rule. Break it. Fix it.">
-        This is the core idea firewalls are built on, and the same one Chapter 7's Zero Trust reframing
+        This is the core idea firewalls are built on, and the same one Chapter 8's Zero Trust reframing
         leans on hardest: a rule written for a port number can be fooled, a rule written for an actual
         application identity can't, and a rule written for a specific person can enforce things neither
         of the others can. Build a rule, choose whether it allows or blocks, then send test traffic
@@ -163,6 +163,10 @@ export function Sandbox() {
               onChange={setRuleMode}
             />
           </div>
+
+          <p className="text-[11.5px] text-ink-faint mb-3.5 -mt-1">
+            <AutoLink text="App-ID and User-ID are one firewall vendor's branded names for capabilities most firewalls implement in some form — Chapter 3 has the full disclosure note." />
+          </p>
 
           {ruleMode === 'port' && (
             <div className="mb-3.5">

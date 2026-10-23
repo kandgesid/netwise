@@ -3,6 +3,18 @@ import clsx from 'clsx';
 import { ChapterPage } from '../layout/ChapterPage';
 import { SectionHead } from '../ui/SectionHead';
 import { Card } from '../ui/Card';
+import { AutoLink } from '../../lib/autoLink';
+
+const UNDECRYPTABLE_POINTS = [
+  {
+    strong: 'Certificate pinning.',
+    text: "Some apps, mobile banking apps are the common example, hardcode which exact certificate they'll accept from a given server, instead of trusting anything a normal chain of trust would validate. Forward proxy's usual move, presenting a different, firewall-signed certificate in place of the real one, gets rejected outright by a pinned app, the same way it would reject an actual attacker's fake certificate. No policy setting fixes this; the fix is a Bypass exception for that specific app.",
+  },
+  {
+    strong: 'Mutual TLS (mTLS).',
+    text: "Normal decryption only requires the firewall to impersonate the server. mTLS asks the server to also demand a certificate from the client, and the firewall doesn't have the client's private key any more than an attacker would, so it can't complete that half of the handshake either, in forward proxy or inbound inspection. Same outcome: Bypass, not a setting to tune.",
+  },
+];
 
 const ACTIONS = [
   { tag: 'Action 1', title: 'Decrypt', text: "The firewall actively intercepts and inspects this traffic, using forward proxy or inbound inspection depending on the direction it's flowing." },
@@ -110,6 +122,20 @@ export function Chapter5DecryptionPolicies() {
           </div>
         ))}
       </div>
+
+      <Card className="mb-7">
+        <h3 className="font-sans font-semibold text-base mb-2.5">Two cases where decryption isn't actually optional</h3>
+        <p className="text-ink-dim text-[14.5px] mb-2.5">
+          <AutoLink text="Bypass above usually reads like a policy choice: performance, compatibility, compliance. Two specific cases aren't a choice at all, the firewall technically cannot complete a normal decrypt no matter what the policy says." />
+        </p>
+        <ul className="pl-4 text-ink-dim text-[14.5px] space-y-2.5 list-disc marker:text-line">
+          {UNDECRYPTABLE_POINTS.map((p) => (
+            <li key={p.strong}>
+              <strong className="text-ink">{p.strong}</strong> <AutoLink text={p.text} />
+            </li>
+          ))}
+        </ul>
+      </Card>
 
       <Card className="mb-7">
         <h3 className="font-sans font-semibold text-base mb-2.5">The general flow</h3>

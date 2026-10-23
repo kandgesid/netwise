@@ -142,9 +142,7 @@ export function Chapter6ForwardProxy() {
       </p>
 
       <p className="text-ink-faint text-[13.5px] mt-2">
-        You've now read through every piece firewalls use to make a decision when trust follows a
-        connection's location: which zone it's in, which policy rule it matches, which certificate gets
-        presented. Chapter 7 asks what changes once location by itself stops being enough.
+        <AutoLink text="You've now read through every piece firewalls use to make a decision when trust follows a connection's location: which zone it's in, which policy rule it matches, which certificate gets presented. One thing all of that quietly assumes: that the Forward Trust CA's private key, the one generated in step 1 above, stays exactly as secret as it needs to be. Chapter 7 is about making sure that's actually true." />
       </p>
     </ChapterPage>
   );

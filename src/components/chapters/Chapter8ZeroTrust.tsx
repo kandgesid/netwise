@@ -91,12 +91,12 @@ const COEXIST_POINTS = [
   },
 ];
 
-export function Chapter7ZeroTrust() {
+export function Chapter8ZeroTrust() {
   return (
-    <ChapterPage title="Chapter 7: Zero Trust">
-      <SectionHead eyebrow="Chapter 7" title="Zero Trust: verify every time">
+    <ChapterPage title="Chapter 8: Zero Trust">
+      <SectionHead eyebrow="Chapter 8" title="Zero Trust: verify every time">
         Chapter 1 opened with a firewall deciding what counts as 'inside' a zone versus 'outside' it,
-        then trusting a lot of what happens next based on that answer alone. Chapters 2 through 6 were
+        then trusting a lot of what happens next based on that answer alone. Chapters 2 through 7 were
         about what a firewall does once traffic reaches that boundary: decrypting it, inspecting it,
         deciding what to do with it. This chapter asks what changes once being inside the zone stops
         being proof of anything by itself.
@@ -107,7 +107,7 @@ export function Chapter7ZeroTrust() {
       <Card id="location" className="mb-5">
         <h3 className="font-sans font-semibold text-base mb-2">When location stops being proof</h3>
         <p className="text-ink-dim text-[14.5px] mb-2.5">
-          <AutoLink text="None of this is a knock on the zone model from Chapter 1. Zones, perimeters, and the whole decrypt-and-inspect pipeline from Chapters 2 through 6 are still exactly how a huge amount of real traffic gets decided on, today, in production. The problem is narrower than 'the old way was wrong': location was always a proxy for trust, not trust itself, and the gap between the two got more expensive to ignore." />
+          <AutoLink text="None of this is a knock on the zone model from Chapter 1. Zones, perimeters, and the whole decrypt-and-inspect pipeline from Chapters 2 through 7 are still exactly how a huge amount of real traffic gets decided on, today, in production. The problem is narrower than 'the old way was wrong': location was always a proxy for trust, not trust itself, and the gap between the two got more expensive to ignore." />
         </p>
         <ul className="pl-4 text-ink-dim text-[14.5px] space-y-2 list-disc marker:text-line">
           {BOUNDARY_POINTS.map((p) => (
@@ -167,7 +167,7 @@ export function Chapter7ZeroTrust() {
       <Card id="coexist" className="mb-5">
         <h3 className="font-sans font-semibold text-base mb-2">Zero Trust doesn't replace the firewall</h3>
         <p className="text-ink-dim text-[14.5px] mb-2.5">
-          <AutoLink text="Every rule the last six chapters covered is still doing real, necessary work. A decryption policy from Chapter 5 still has to run before anything downstream can be inspected at all. App-ID, User-ID, and Content-ID from Chapter 3 are still how a firewall answers what actually is this, who's actually sending it, and is anything in it dangerous. Zones from Chapter 1 haven't gone anywhere either." />
+          <AutoLink text="Every rule the last seven chapters covered is still doing real, necessary work. A decryption policy from Chapter 5 still has to run before anything downstream can be inspected at all. App-ID, User-ID, and Content-ID from Chapter 3 are still how a firewall answers what actually is this, who's actually sending it, and is anything in it dangerous. Zones from Chapter 1 haven't gone anywhere either." />
         </p>
         <ul className="pl-4 text-ink-dim text-[14.5px] space-y-2 list-disc marker:text-line">
           {COEXIST_POINTS.map((p) => (
@@ -180,7 +180,7 @@ export function Chapter7ZeroTrust() {
 
       <p className="text-ink-faint text-[13.5px] mt-4">
         You've now seen both halves: the zone-based, decrypt-and-inspect model from Chapters 1 through
-        6, and the identity-and-device-checked model this chapter adds on top of it. Time to build a
+        7, and the identity-and-device-checked model this chapter adds on top of it. Time to build a
         rule yourself in the{' '}
         <Link to="/sandbox" className={TOOL_LINK_CLASS}>
           Sandbox

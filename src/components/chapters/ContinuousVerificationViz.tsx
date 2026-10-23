@@ -45,7 +45,7 @@ const CAVEAT =
   "One thing 'continuous' doesn't mean here: a literal nonstop stream of checks running underneath the whole session. In practice it means re-evaluating at the next request, or on a short interval, not once at login and never again, still much more often than the perimeter model's exactly-once check, just not literally infinite.";
 
 const CLOSING =
-  "This doesn't make everything Chapters 1 through 6 taught wrong, a firewall zone is still a real control. It just isn't treated as sufficient on its own anymore. That's the shift Zero Trust names: necessary, not sufficient.";
+  "This doesn't make everything Chapters 1 through 7 taught wrong, a firewall zone is still a real control. It just isn't treated as sufficient on its own anymore. That's the shift Zero Trust names: necessary, not sufficient.";
 
 export function ContinuousVerificationViz() {
   const [posture, setPosture] = useState<Posture>('healthy');
