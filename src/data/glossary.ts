@@ -52,7 +52,7 @@ export const GLOSSARY: Record<GlossaryCategory, GlossaryEntry[]> = {
     { term: 'IPSec', def: 'A suite of protocols for encrypting and authenticating IP traffic, most commonly used for site-to-site VPNs.' },
     { term: 'IKE', def: 'Internet Key Exchange: the negotiation phase where two VPN endpoints authenticate each other and agree on encryption keys before any real traffic flows.' },
     { term: 'Site-to-site VPN', def: 'A permanent, usually always-on tunnel connecting two networks, such as two office locations.' },
-    { term: 'Remote-access VPN', def: 'A tunnel a single user\'s device establishes on demand, typically to reach a company network from home or while travelling.' },
+    { term: 'Remote-access VPN', def: 'A tunnel a single user\'s device establishes on demand, typically to reach a company network from home or while traveling.' },
     { term: 'Pre-shared key (PSK)', def: 'A shared secret both VPN endpoints already know, typed in ahead of time, used to authenticate each other instead of certificates.' },
   ],
   zerotrust: [
